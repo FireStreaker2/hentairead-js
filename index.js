@@ -167,11 +167,22 @@ class HentaiRead {
 				] = $(element).find(".post-meta-value").text();
 			});
 
+			const images = {};
+			const src = $(container).find("img").attr("data-srcset");
+			if (src) {
+				const values = src.split(",").map((value) => value.trim());
+				values.forEach((value) => {
+					const [url, size] = value.split(" ");
+					images[size] = url;
+				});
+			}
+
 			const data = {
 				name: container.find(".post-title").text().replaceAll("\n", "").trim(),
 				alt: container.find(".alt-title").text(),
 				id: container.find(".post-id a").text(),
 				href: `https://hentairead.com/hentai/${doujin}/`,
+				images: images,
 				rating: container
 					.find(".total_votes")
 					.text()
@@ -205,6 +216,92 @@ class HentaiRead {
 			}
 
 			return data;
+		} catch (error) {
+			throw new Error(`Error when fetching: ${error}`);
+		}
+	}
+
+	static async getPages(doujin) {
+		if (typeof doujin !== "string")
+			throw new Error("Doujin name must be a string");
+
+		try {
+			const response = await fetch(
+				`https://hentairead.com/hentai/${doujin}/english/p/1/`
+			);
+
+			if (!response.ok)
+				throw new Error(`Error when fetching: Status Code ${response.status}`);
+
+			const html = await response.text();
+			const $ = cheerio.load(html);
+
+			return JSON.parse(
+				$("#chapter_preloaded_images")
+					.text()
+					.match(/\[.*\]/)[0]
+			).map((image) => image.src);
+		} catch (error) {
+			throw new Error(`Error when fetching: ${error}`);
+		}
+	}
+
+	static async searchByTag(tag) {
+		if (typeof tag !== "string") throw new Error("Tag name must be a string");
+
+		try {
+			const response = await fetch(`https://hentairead.com/tag/${tag}/`);
+
+			if (!response.ok)
+				throw new Error(`Error when fetching: Status Code ${response.status}`);
+
+			const html = await response.text();
+			const $ = cheerio.load(html);
+			const container = $(".page-listing-grid");
+
+			if (container.length <= 0 || !container.is("div"))
+				throw new Error("Error when parsing");
+
+			const doujins = [];
+
+			container.children().each((index, result) => {
+				const name = $(result).find("a:last");
+
+				const tags = [];
+				$(result)
+					.find(".tag-name")
+					.each((index, tag) => tags.push($(tag).text()));
+
+				const images = {};
+				const src = $(result).find("img").attr("data-srcset");
+				if (src) {
+					const values = src.split(",").map((value) => value.trim());
+					values.forEach((value) => {
+						const [url, size] = value.split(" ");
+						images[size] = url;
+					});
+				}
+
+				doujins.push({
+					name: name.text(),
+					tags: tags,
+					images: images,
+					pages: $(result)
+						.find(".item__total-pages")
+						.text()
+						.replaceAll("\n", "")
+						.trim(),
+					views: $(result).find(".item__total-views").find("span").text(),
+					rating: $(result)
+						.find(".item__rating")
+						.text()
+						.replaceAll("\n", "")
+						.trim(),
+					href: name.attr("href"),
+				});
+			});
+
+			return doujins;
 		} catch (error) {
 			throw new Error(`Error when fetching: ${error}`);
 		}
