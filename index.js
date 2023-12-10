@@ -63,10 +63,12 @@ class HentaiRead {
 		}
 	}
 
-	static async search(query) {
+	static async search(query, page = 1) {
 		if (typeof query !== "string") throw new Error("Query must be a string");
 
-		return await this.searchPage(`https://hentairead.com/?s=${query}`);
+		return await this.searchPage(
+			`https://hentairead.com/page/${page}/?s=${query}`
+		);
 	}
 
 	static async exists(query) {
@@ -78,14 +80,14 @@ class HentaiRead {
 		return false;
 	}
 
-	static async top(range) {
+	static async top(range, page = 1) {
 		const allowed = ["day", "week", "month", "year", "all"];
 
 		if (!allowed.includes(range))
 			throw new Error("Range must be day, week, month, year, or all");
 
 		return await this.searchPage(
-			`https://hentairead.com/top-hentai/?range=${range}`
+			`https://hentairead.com/top-hentai/page/${page}/?range=${range}`
 		);
 	}
 
@@ -177,8 +179,12 @@ class HentaiRead {
 			throw new Error("Doujin name must be a string");
 
 		try {
+			const info = await this.getInfo(doujin);
+
 			const response = await fetch(
-				`https://hentairead.com/hentai/${doujin}/english/p/1/`
+				`https://hentairead.com/hentai/${doujin}/${info[
+					"language"
+				].toLowerCase()}/p/1/`
 			);
 
 			if (!response.ok)
@@ -197,7 +203,7 @@ class HentaiRead {
 		}
 	}
 
-	static async searchIndex(index, query) {
+	static async searchIndex(index, query, page = 1) {
 		const allowed = [
 			"tag",
 			"character",
@@ -207,20 +213,23 @@ class HentaiRead {
 			"release",
 			"collection",
 			"circle",
+			"language",
 		];
 
 		if (!allowed.includes(index)) throw new Error("Index does not exist");
 		if (typeof query !== "string") throw new Error("Query must be a string");
 
-		return await this.searchPage(`https://hentairead.com/${index}/${query}/`);
+		return await this.searchPage(
+			`https://hentairead.com/${index}/${query}/page/${page}/`
+		);
 	}
 
-	static async getHome() {
-		return this.searchPage("https://hentairead.com");
+	static async getHome(page = 1) {
+		return this.searchPage(`https://hentairead.com/page/${page}`);
 	}
 
-	static async getAll() {
-		return this.searchPage("https://hentairead.com/hentai/");
+	static async getAll(page = 1) {
+		return this.searchPage(`https://hentairead.com/hentai/page/${page}/`);
 	}
 
 	static async getRandom() {
