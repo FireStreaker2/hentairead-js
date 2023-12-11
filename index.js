@@ -63,11 +63,11 @@ class HentaiRead {
 		}
 	}
 
-	static async search(query, page = 1) {
-		if (typeof query !== "string") throw new Error("Query must be a string");
-
+	static async search(options) {
 		return await this.searchPage(
-			`https://hentairead.com/page/${page}/?s=${query}`
+			`https://hentairead.com/page/${options.page}/?${new URLSearchParams(
+				options
+			).toString()}`
 		);
 	}
 
@@ -203,7 +203,13 @@ class HentaiRead {
 		}
 	}
 
-	static async searchIndex(index, query, page = 1) {
+	static async searchIndex(
+		index,
+		query,
+		page = 1,
+		sort = "new",
+		order = "desc"
+	) {
 		const allowed = [
 			"tag",
 			"character",
@@ -220,7 +226,7 @@ class HentaiRead {
 		if (typeof query !== "string") throw new Error("Query must be a string");
 
 		return await this.searchPage(
-			`https://hentairead.com/${index}/${query}/page/${page}/`
+			`https://hentairead.com/${index}/${query}/page/${page}/?m_orderby=${sort}&m_order=${order}`
 		);
 	}
 
@@ -228,8 +234,10 @@ class HentaiRead {
 		return this.searchPage(`https://hentairead.com/page/${page}`);
 	}
 
-	static async getAll(page = 1) {
-		return this.searchPage(`https://hentairead.com/hentai/page/${page}/`);
+	static async getAll(page = 1, sort = "new", order = "desc") {
+		return this.searchPage(
+			`https://hentairead.com/hentai/page/${page}/?m_orderby=${sort}&m_order=${order}`
+		);
 	}
 
 	static async getRandom() {
