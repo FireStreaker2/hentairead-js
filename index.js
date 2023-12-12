@@ -1,7 +1,18 @@
 const cheerio = require("cheerio");
 const fetch = require("node-fetch");
 
+/**
+ * HentaiRead class
+ */
 class HentaiRead {
+	/**
+	 * Scrape a page and return all the doujins listed on that page
+	 * @param {string} url - URL to scrape
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async searchPage(url) {
 		if (typeof url !== "string") throw new Error("URL must be a string");
 
@@ -63,6 +74,14 @@ class HentaiRead {
 		}
 	}
 
+	/**
+	 * Search for a specific doujin with many parameters
+	 * @param {object} options - An object representing query strings to search with
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async search(options) {
 		return await this.searchPage(
 			`https://hentairead.com/page/${options.page}/?${new URLSearchParams(
@@ -71,6 +90,14 @@ class HentaiRead {
 		);
 	}
 
+	/**
+	 * Check whether a doujin exists or not
+	 * @param {string} query - The search query
+	 * @returns {Promise} - Promise representing a boolean of whether the doujin exists or not
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async exists(query) {
 		if (typeof query !== "string") throw new Error("Query must be a string");
 
@@ -80,6 +107,15 @@ class HentaiRead {
 		return false;
 	}
 
+	/**
+	 * Get the top doujins based off of the provided range
+	 * @param {string} range - How far to look
+	 * @param {number} page - Page number to look at
+	 * @returns {Promise} A promise that contains an array of results
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async top(range, page = 1) {
 		const allowed = ["day", "week", "month", "year", "all"];
 
@@ -91,6 +127,14 @@ class HentaiRead {
 		);
 	}
 
+	/**
+	 * Get the info of a specific doujin
+	 * @param {string} doujin - The doujin to search for
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async getInfo(doujin) {
 		if (typeof doujin !== "string")
 			throw new Error("Doujin name must be a string");
@@ -174,6 +218,14 @@ class HentaiRead {
 		}
 	}
 
+	/**
+	 * Get all the pages of a specific doujin
+	 * @param {string} doujin
+	 * @returns {Promise} A promise that contains an array with the corresponding images
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async getPages(doujin) {
 		if (typeof doujin !== "string")
 			throw new Error("Doujin name must be a string");
@@ -203,6 +255,18 @@ class HentaiRead {
 		}
 	}
 
+	/**
+	 * Search through a specific index with a specific query
+	 * @param {string} index - The index to search through
+	 * @param {string} query - The query to search with
+	 * @param {number} page - Page number to look at
+	 * @param {string} sort - How to search the results
+	 * @param {string} order - Whether to display the results in ascending or descending order
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async searchIndex(
 		index,
 		query,
@@ -230,16 +294,41 @@ class HentaiRead {
 		);
 	}
 
+	/**
+	 * Get the doujins displayed on the home page
+	 * @param {number} page - Page number to look at
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async getHome(page = 1) {
 		return this.searchPage(`https://hentairead.com/page/${page}`);
 	}
 
+	/**
+	 * Get a list of all doujins
+	 * @param {number} page - Page number to look at
+	 * @param {string} sort - How to search the results
+	 * @param {string} order - Whether to display the results in ascending or descending order
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async getAll(page = 1, sort = "new", order = "desc") {
 		return this.searchPage(
 			`https://hentairead.com/hentai/page/${page}/?m_orderby=${sort}&m_order=${order}`
 		);
 	}
 
+	/**
+	 * Get a random doujin
+	 * @returns {Promise} A promise that contains an object with the corresponding info
+	 * @throws {error} If there is an error while searching
+	 * @static
+	 * @async
+	 */
 	static async getRandom() {
 		try {
 			const response = await fetch("https://hentairead.com/?random_manga=1");
