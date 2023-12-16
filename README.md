@@ -30,6 +30,8 @@ $ npm i hentairead-js
 ```js
 // index.js
 const HentaiRead = require("hentairead-js");
+// or alternatively:
+// import HentaiRead from "hentairead-js";
 
 (async () => {
   // search for the first page of all doujins that have the word "neko"
@@ -46,6 +48,7 @@ const HentaiRead = require("hentairead-js");
 | What parameters does the ``search`` method accept?           | The search method accepts anything as a parameter, because of all the possible variations of searches. While it can't check if something is valid or not, it will throw an error if a ``404`` is found. For a list of all accepted parameters, you can look at the query parameters found [here](https://hentairead.com/?s) (click advanced). |
 | Why do I get a timeout error? / Why does it keep on hanging? | Try checking your internet connection to make sure it's stable.                                                                                                                                                                                                                                                                               |
 | Does this support synchronous functions?                     | No, everything is fully asynchronous                                                                                                                                                                                                                                                                                                          |
+| Does this support both CJS and ESM?                          | Yes, both work with this package                                                                                                                                                                                                                                                                                                              |
 
 # Contributing
 If you would like to contribute, you can <a href="https://github.com/FireStreaker2/hentairead-js/fork">fork the repo</a> and <a href="https://github.com/FireStreaker2/hentairead-js/compare">make a PR</a>, or contact me via email @ ``suggestions@firestreaker2.gq``
